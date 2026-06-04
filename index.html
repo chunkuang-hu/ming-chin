@@ -25,8 +25,8 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;h
 .header{background:var(--ink);padding:10px 18px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid var(--gold);flex-shrink:0}
 .header h1{font-family:"Noto Serif SC",serif;font-size:1.1rem;letter-spacing:.06em;color:#f0e0c0}
 .header .sub{font-size:.62rem;color:#7090b0;letter-spacing:.12em;text-transform:uppercase}
-.map-wrap{position:relative;background:var(--ocean);background-image:radial-gradient(ellipse at 75% 85%,#a8c8e0 0%,transparent 55%),radial-gradient(ellipse at 15% 25%,#d0e4f0 0%,transparent 45%);overflow:hidden;touch-action:none;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-#map-svg{display:block;width:100%;height:auto;max-height:100%;transform-origin:center center;will-change:transform;touch-action:none}
+.map-wrap{position:relative;background:var(--ocean);background-image:radial-gradient(ellipse at 75% 85%,#a8c8e0 0%,transparent 55%),radial-gradient(ellipse at 15% 25%,#d0e4f0 0%,transparent 45%);touch-action:none;flex:1;min-height:0;overflow:hidden}
+#map-svg{display:block;width:100%;height:100%;touch-action:none}
 .province{fill:var(--land);stroke:var(--border);stroke-width:.55;transition:fill .18s;cursor:pointer}
 .province:hover{fill:var(--land-hover)}
 .grid-lon,.grid-lat{stroke:var(--grid);stroke-width:.7;stroke-dasharray:5 4;fill:none}
@@ -486,14 +486,39 @@ const cities = Array.from(document.querySelectorAll('.mcity')).map(c => ({
   r:  parseFloat(c.getAttribute('r')) || 5.5
 }));
 
-// 把螢幕座標轉成 SVG viewBox 座標（無 CSS transform，直接對應）
-function screenToSVG(clientX, clientY) {
+// 把螢幕座標轉成 SVG viewBox 座標（考慮 preserveAspectRatio letterbox）
+function getLetterbox() {
   const svgEl = document.getElementById('map-svg');
   const r = svgEl.getBoundingClientRect();
-  // r 是 SVG 元素實際在螢幕上的位置（height:auto 時比例正確）
-  const px = (clientX - r.left) / r.width  * vw;
-  const py = (clientY - r.top)  / r.height * vh;
+  // SVG viewBox 比例
+  const vbAR = vw / vh;
+  const elAR = r.width / r.height;
+  let drawW, drawH, offX, offY;
+  if (elAR > vbAR) {
+    // 左右有留白
+    drawH = r.height;
+    drawW = drawH * vbAR;
+    offX  = (r.width - drawW) / 2;
+    offY  = 0;
+  } else {
+    // 上下有留白
+    drawW = r.width;
+    drawH = drawW / vbAR;
+    offX  = 0;
+    offY  = (r.height - drawH) / 2;
+  }
+  return { left: r.left + offX, top: r.top + offY, width: drawW, height: drawH };
+}
+
+function screenToSVG(clientX, clientY) {
+  const lb = getLetterbox();
+  const px = (clientX - lb.left) / lb.width  * vw;
+  const py = (clientY - lb.top)  / lb.height * vh;
   return { x: vx + px, y: vy + py };
+}
+
+function clientToSVG(clientX, clientY) {
+  return screenToSVG(clientX, clientY);
 }
 
 // 找最近城市（只要在圓點半徑內）
