@@ -25,8 +25,8 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;h
 .header{background:var(--ink);padding:10px 18px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid var(--gold);flex-shrink:0}
 .header h1{font-family:"Noto Serif SC",serif;font-size:1.1rem;letter-spacing:.06em;color:#f0e0c0}
 .header .sub{font-size:.62rem;color:#7090b0;letter-spacing:.12em;text-transform:uppercase}
-.map-wrap{position:relative;background:var(--ocean);background-image:radial-gradient(ellipse at 75% 85%,#a8c8e0 0%,transparent 55%),radial-gradient(ellipse at 15% 25%,#d0e4f0 0%,transparent 45%);overflow:hidden;touch-action:none;flex:1;min-height:0}
-#map-svg{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center center;will-change:transform;touch-action:none}
+.map-wrap{position:relative;background:var(--ocean);background-image:radial-gradient(ellipse at 75% 85%,#a8c8e0 0%,transparent 55%),radial-gradient(ellipse at 15% 25%,#d0e4f0 0%,transparent 45%);overflow:hidden;touch-action:none;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#map-svg{display:block;width:100%;height:auto;max-height:100%;transform-origin:center center;will-change:transform;touch-action:none}
 .province{fill:var(--land);stroke:var(--border);stroke-width:.55;transition:fill .18s;cursor:pointer}
 .province:hover{fill:var(--land-hover)}
 .grid-lon,.grid-lat{stroke:var(--grid);stroke-width:.7;stroke-dasharray:5 4;fill:none}
@@ -261,8 +261,8 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;h
         <circle class="mcity" cx="392.5" cy="313.7" r="5.5" fill="#3a86ff" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="敘州府｜四川｜明朝控制" data-official-role="武將" data-official-name="王祥（敘州參將）" data-official-bio="1643年駐守敘州，防禦西南方向，是四川南部邊境的重要守將。" data-official-icon="⚔️"/>
         <!-- 湖廣：大順攻佔武昌（1643年）；荊州、岳州亦陷 -->
         <circle class="mcity" cx="515.3" cy="291.3" r="5.5" fill="#e8b800" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="武昌府｜湖廣｜大順控制（1643年攻佔）" data-official-role="武將" data-official-name="左良玉（平賊將軍）" data-official-bio="1643年擁兵八十萬坐鎮武昌，是崇禎末年最大的藩鎮。名義上討伐流賊，實則擁兵自重，朝廷無力節制。" data-official-icon="⚔️"/>
-        <circle class="mcity" cx="489.1" cy="293.7" r="5.5" fill="#e8b800" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="荊州府｜湖廣｜大順控制" data-official-role="武將" data-official-name="左夢庚（荊州守將）" data-official-bio="左良玉之子，1643年隨父鎮守湖廣，駐荊州協防。後左良玉死，左夢庚率部降清。" data-official-icon="⚔️"/>
-        <circle class="mcity" cx="500.4" cy="305.9" r="5.5" fill="#e8b800" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="岳州府｜湖廣｜大順控制" data-official-role="武將" data-official-name="黃朝宣（岳州總兵）" data-official-bio="1643年駐守岳州，扼洞庭湖北口要衝，抵禦張獻忠大西軍北上與大順軍南下的雙重威脅。" data-official-icon="⚔️"/>
+        <circle class="mcity" cx="483.1" cy="293.7" r="5.5" fill="#e8b800" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="荊州府｜湖廣｜大順控制" data-official-role="武將" data-official-name="左夢庚（荊州守將）" data-official-bio="左良玉之子，1643年隨父鎮守湖廣，駐荊州協防。後左良玉死，左夢庚率部降清。" data-official-icon="⚔️"/>
+        <circle class="mcity" cx="500.4" cy="311.9" r="5.5" fill="#e8b800" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="岳州府｜湖廣｜大順控制" data-official-role="武將" data-official-name="黃朝宣（岳州總兵）" data-official-bio="1643年駐守岳州，扼洞庭湖北口要衝，抵禦張獻忠大西軍北上與大順軍南下的雙重威脅。" data-official-icon="⚔️"/>
         <circle class="mcity" cx="498.5" cy="320.3" r="5.5" fill="#3a86ff" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="長沙府｜湖廣｜明朝控制" data-official-role="文官" data-official-name="堵胤錫（湖廣巡撫）" data-official-bio="1643年任湖廣巡撫，駐長沙，積極聯絡各方勢力對抗流賊，後在南明時期成為最重要的抗清文臣之一。" data-official-icon="📜"/>
         <!-- 江西：明朝控制 -->
         <circle class="mcity" cx="550.3" cy="310.9" r="5.5" fill="#3a86ff" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" data-label="饒州府｜江西｜明朝控制" data-official-role="文官" data-official-name="劉曠（饒州知府）" data-official-bio="1643年任饒州知府，主持鄱陽湖北岸的地方行政，維持江西北部稅收與社會秩序。" data-official-icon="📜"/>
@@ -486,25 +486,23 @@ const cities = Array.from(document.querySelectorAll('.mcity')).map(c => ({
   r:  parseFloat(c.getAttribute('r')) || 5.5
 }));
 
-// 把螢幕座標轉成 SVG 座標（考慮 CSS transform）
+// 把螢幕座標轉成 SVG viewBox 座標（無 CSS transform，直接對應）
 function screenToSVG(clientX, clientY) {
-  const r = mw.getBoundingClientRect();
-  // map-wrap 中心點
-  const cx = r.left + r.width  / 2;
-  const cy = r.top  + r.height / 2;
-  // 還原 CSS transform：先減平移，再除以 scale，再轉 SVG viewBox
-  const sx = ((clientX - cx - tx) / scale + r.width  / 2) / r.width  * SVG_W;
-  const sy = ((clientY - cy - ty) / scale + r.height / 2) / r.height * SVG_H;
-  return { x: sx, y: sy };
+  const svgEl = document.getElementById('map-svg');
+  const r = svgEl.getBoundingClientRect();
+  // r 是 SVG 元素實際在螢幕上的位置（height:auto 時比例正確）
+  const px = (clientX - r.left) / r.width  * vw;
+  const py = (clientY - r.top)  / r.height * vh;
+  return { x: vx + px, y: vy + py };
 }
 
-// 找最近且在點擊半徑內的城市（加大點擊容錯到 r+8px）
+// 找最近城市（只要在圓點半徑內）
 function findNearestCity(svgX, svgY) {
   let best = null, bestD = Infinity;
   for (const c of cities) {
     const dx = svgX - c.cx, dy = svgY - c.cy;
     const d  = Math.sqrt(dx*dx + dy*dy);
-    if (d < c.r + 10 && d < bestD) { best = c; bestD = d; }
+    if (d < c.r + 6 && d < bestD) { best = c; bestD = d; }
   }
   return best;
 }
@@ -521,26 +519,23 @@ mw.addEventListener('click', e => {
   handleMapTap(e.clientX, e.clientY, e.target);
 });
 
-// ── Pinch-zoom & pan ────────────────────────────────────
-let scale = 1, tx = 0, ty = 0;
+// ── Pinch-zoom & pan（操作 viewBox，不用 CSS transform）──
+const SVG_ORIG_X = 0, SVG_ORIG_Y = 0;
+let vx = 0, vy = 0, vw = SVG_W, vh = SVG_H; // 目前 viewBox
 let pinching = false;
 let lastPinchDist = 0;
-let lastPinchMid = {x:0, y:0};
 let panStart = null;
+let touchMoved = false;
 
-const svg = document.getElementById('map-svg');
+const svgEl = document.getElementById('map-svg');
 
-function applyTransform() {
-  // 限制縮放範圍
-  scale = Math.min(Math.max(scale, 1), 6);
-  // 限制平移範圍，避免地圖滑出視窗
-  const mwR = mw.getBoundingClientRect();
-  const maxTx = (scale - 1) * mwR.width  / 2;
-  const maxTy = (scale - 1) * mwR.height / 2;
-  tx = Math.min(Math.max(tx, -maxTx), maxTx);
-  ty = Math.min(Math.max(ty, -maxTy), maxTy);
-  svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
-  svg.style.transformOrigin = 'center center';
+function setViewBox() {
+  // 限制不能超出原始範圍
+  vw = Math.min(Math.max(vw, SVG_W / 6), SVG_W);
+  vh = Math.min(Math.max(vh, SVG_H / 6), SVG_H);
+  vx = Math.min(Math.max(vx, 0), SVG_W - vw);
+  vy = Math.min(Math.max(vy, 0), SVG_H - vh);
+  svgEl.setAttribute('viewBox', `${vx} ${vy} ${vw} ${vh}`);
 }
 
 function pinchDist(touches) {
@@ -548,51 +543,55 @@ function pinchDist(touches) {
   const dy = touches[0].clientY - touches[1].clientY;
   return Math.sqrt(dx*dx + dy*dy);
 }
-function pinchMid(touches) {
+
+// 把螢幕座標轉成 SVG 座標（給 pinch 用）
+function clientToSVG(clientX, clientY) {
+  const r = svgEl.getBoundingClientRect();
   return {
-    x: (touches[0].clientX + touches[1].clientX) / 2,
-    y: (touches[0].clientY + touches[1].clientY) / 2
+    x: vx + (clientX - r.left) / r.width  * vw,
+    y: vy + (clientY - r.top)  / r.height * vh
   };
 }
 
 mw.addEventListener('touchstart', e => {
   if (e.touches.length === 2) {
-    e.preventDefault(); // 阻止瀏覽器預設縮放
+    e.preventDefault();
     pinching = true;
     touchMoved = true;
     lastPinchDist = pinchDist(e.touches);
-    lastPinchMid  = pinchMid(e.touches);
   } else if (e.touches.length === 1) {
     pinching = false;
     touchMoved = false;
-    panStart = { x: e.touches[0].clientX - tx, y: e.touches[0].clientY - ty };
+    panStart = clientToSVG(e.touches[0].clientX, e.touches[0].clientY);
   }
 }, { passive: false });
 
 mw.addEventListener('touchmove', e => {
+  e.preventDefault();
   if (e.touches.length === 2) {
-    e.preventDefault();
     touchMoved = true;
     const dist = pinchDist(e.touches);
-    const mid  = pinchMid(e.touches);
-    const delta = dist / lastPinchDist;
-    const mwR = mw.getBoundingClientRect();
-    const cx = mid.x - mwR.left - mwR.width  / 2;
-    const cy = mid.y - mwR.top  - mwR.height / 2;
-    tx += (cx - tx) * (1 - delta);
-    ty += (cy - ty) * (1 - delta);
-    scale *= delta;
+    const ratio = lastPinchDist / dist; // <1 放大, >1 縮小
+    // pinch 中心點在 SVG 座標
+    const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    const mid = clientToSVG(mx, my);
+    // 以中心點縮放 viewBox
+    vx = mid.x - (mid.x - vx) * ratio;
+    vy = mid.y - (mid.y - vy) * ratio;
+    vw *= ratio;
+    vh *= ratio;
     lastPinchDist = dist;
-    lastPinchMid  = mid;
-    applyTransform();
-  } else if (e.touches.length === 1 && !pinching && scale > 1) {
-    e.preventDefault();
+    setViewBox();
+  } else if (e.touches.length === 1 && !pinching) {
     touchMoved = true;
-    tx = e.touches[0].clientX - panStart.x;
-    ty = e.touches[0].clientY - panStart.y;
-    applyTransform();
-  } else {
-    touchMoved = true;
+    const cur = clientToSVG(e.touches[0].clientX, e.touches[0].clientY);
+    // panStart 是按下時的 SVG 座標，平移讓那個點跟著手指
+    vx -= cur.x - panStart.x;
+    vy -= cur.y - panStart.y;
+    setViewBox();
+    // 更新 panStart（因為 viewBox 已變）
+    panStart = clientToSVG(e.touches[0].clientX, e.touches[0].clientY);
   }
 }, { passive: false });
 
@@ -604,10 +603,10 @@ mw.addEventListener('touchend', e => {
   handleMapTap(t.clientX, t.clientY, e.target);
 });
 
-// 雙擊重置縮放
+// 雙擊重置
 mw.addEventListener('dblclick', () => {
-  scale = 1; tx = 0; ty = 0;
-  applyTransform();
+  vx = 0; vy = 0; vw = SVG_W; vh = SVG_H;
+  setViewBox();
 });
 
 // ── City markers hover（桌面） ────────────────────────────
