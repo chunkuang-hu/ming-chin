@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>明朝地圖 · 兩京十三布政使司</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400&display=swap');
@@ -20,13 +20,13 @@
   --gold: #9a6820;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#1c2030;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:"Noto Sans SC",sans-serif;padding:16px}
-.card{background:var(--paper);border-radius:3px;box-shadow:0 24px 64px rgba(0,0,0,0.55),0 0 0 1px var(--border);max-width:940px;width:100%;overflow:hidden}
+body{background:#1c2030;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:"Noto Sans SC",sans-serif;padding:16px;touch-action:pan-x pan-y}
+.card{background:var(--paper);border-radius:3px;box-shadow:0 24px 64px rgba(0,0,0,0.55),0 0 0 1px var(--border);max-width:940px;width:100%;overflow:hidden;touch-action:pan-x pan-y}
 .header{background:var(--ink);padding:18px 26px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid var(--gold)}
 .header h1{font-family:"Noto Serif SC",serif;font-size:1.35rem;letter-spacing:.06em;color:#f0e0c0}
 .header .sub{font-size:.7rem;color:#7090b0;letter-spacing:.14em;text-transform:uppercase}
-.map-wrap{position:relative;background:var(--ocean);background-image:radial-gradient(ellipse at 75% 85%,#a8c8e0 0%,transparent 55%),radial-gradient(ellipse at 15% 25%,#d0e4f0 0%,transparent 45%);overflow:hidden}
-#map-svg{display:block;width:100%;height:auto}
+.map-wrap{position:relative;background:var(--ocean);background-image:radial-gradient(ellipse at 75% 85%,#a8c8e0 0%,transparent 55%),radial-gradient(ellipse at 15% 25%,#d0e4f0 0%,transparent 45%);overflow:hidden;touch-action:none}
+#map-svg{display:block;width:100%;height:auto;transform-origin:center center;will-change:transform;touch-action:none}
 .province{fill:var(--land);stroke:var(--border);stroke-width:.55;transition:fill .18s;cursor:pointer}
 .province:hover{fill:var(--land-hover)}
 .grid-lon,.grid-lat{stroke:var(--grid);stroke-width:.7;stroke-dasharray:5 4;fill:none}
@@ -47,14 +47,26 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;m
 
 /* ── Official panel（地圖下方）── */
 #official-panel{
-  display:none;
+  display:block;
   background:var(--ink);
   border-top:2px solid var(--gold);
   padding:14px 18px 16px;
   font-family:"Noto Sans SC",sans-serif;
   position:relative;
+  min-height:108px;
 }
-#official-panel.visible{display:block}
+#op-placeholder{
+  display:flex;align-items:center;justify-content:center;
+  height:76px;
+  color:rgba(144,160,180,.3);
+  font-size:.78rem;letter-spacing:.22em;
+  font-family:"Noto Serif SC",serif;
+  pointer-events:none;
+}
+#op-content{display:none}
+#official-panel.visible #op-placeholder{display:none}
+#official-panel.visible #op-content{display:block}
+#official-panel.visible #op-close{display:block}
 #op-header{
   display:flex;align-items:center;gap:10px;margin-bottom:10px;
 }
@@ -388,18 +400,21 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;m
     <div class="coords" id="cd">游標位置：—</div>
   </div>
   <div id="official-panel">
-    <button id="op-close" title="關閉">✕</button>
-    <div id="op-header">
-      <span id="op-icon">📜</span>
-      <div>
-        <div id="op-city">—</div>
-        <div id="op-faction">—</div>
+    <button id="op-close" title="關閉" style="display:none">✕</button>
+    <div id="op-placeholder">點選城市查看人物</div>
+    <div id="op-content">
+      <div id="op-header">
+        <span id="op-icon">📜</span>
+        <div>
+          <div id="op-city">—</div>
+          <div id="op-faction">—</div>
+        </div>
       </div>
-    </div>
-    <div id="op-body">
-      <span id="op-role-badge" class="badge-wen">文官</span>
-      <div id="op-name">—</div>
-      <div id="op-bio">—</div>
+      <div id="op-body">
+        <span id="op-role-badge" class="badge-wen">文官</span>
+        <div id="op-name">—</div>
+        <div id="op-bio">—</div>
+      </div>
     </div>
   </div>
 </div>
@@ -449,10 +464,12 @@ function showPanel(el) {
   document.getElementById('op-bio').textContent  = d.officialBio;
 
   panel.classList.add('visible');
+  document.getElementById('op-close').style.display = 'block';
 }
 
 function closePanel() {
   panel.classList.remove('visible');
+  document.getElementById('op-close').style.display = 'none';
   if (activeCity) { activeCity.classList.remove('active'); activeCity = null; }
 }
 
@@ -467,17 +484,16 @@ const cities = Array.from(document.querySelectorAll('.mcity')).map(c => ({
   r:  parseFloat(c.getAttribute('r')) || 5.5
 }));
 
-// 把螢幕座標轉成 SVG 座標
+// 把螢幕座標轉成 SVG 座標（考慮 CSS transform）
 function screenToSVG(clientX, clientY) {
-  const svg = document.getElementById('map-svg');
-  try {
-    const pt = svg.createSVGPoint();
-    pt.x = clientX; pt.y = clientY;
-    return pt.matrixTransform(svg.getScreenCTM().inverse());
-  } catch(err) {
-    const r = svg.getBoundingClientRect();
-    return { x: (clientX-r.left)*(SVG_W/r.width), y: (clientY-r.top)*(SVG_H/r.height) };
-  }
+  const r = mw.getBoundingClientRect();
+  // map-wrap 中心點
+  const cx = r.left + r.width  / 2;
+  const cy = r.top  + r.height / 2;
+  // 還原 CSS transform：先減平移，再除以 scale，再轉 SVG viewBox
+  const sx = ((clientX - cx - tx) / scale + r.width  / 2) / r.width  * SVG_W;
+  const sy = ((clientY - cy - ty) / scale + r.height / 2) / r.height * SVG_H;
+  return { x: sx, y: sy };
 }
 
 // 找最近且在點擊半徑內的城市（加大點擊容錯到 r+8px）
@@ -503,14 +519,93 @@ mw.addEventListener('click', e => {
   handleMapTap(e.clientX, e.clientY, e.target);
 });
 
-let touchMoved = false;
-mw.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
-mw.addEventListener('touchmove',  () => { touchMoved = true;  }, { passive: true });
+// ── Pinch-zoom & pan ────────────────────────────────────
+let scale = 1, tx = 0, ty = 0;
+let pinching = false;
+let lastPinchDist = 0;
+let lastPinchMid = {x:0, y:0};
+let panStart = null;
+
+const svg = document.getElementById('map-svg');
+
+function applyTransform() {
+  // 限制縮放範圍
+  scale = Math.min(Math.max(scale, 1), 6);
+  // 限制平移範圍，避免地圖滑出視窗
+  const mwR = mw.getBoundingClientRect();
+  const maxTx = (scale - 1) * mwR.width  / 2;
+  const maxTy = (scale - 1) * mwR.height / 2;
+  tx = Math.min(Math.max(tx, -maxTx), maxTx);
+  ty = Math.min(Math.max(ty, -maxTy), maxTy);
+  svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  svg.style.transformOrigin = 'center center';
+}
+
+function pinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+function pinchMid(touches) {
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2
+  };
+}
+
+mw.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    pinching = true;
+    touchMoved = true; // 防止 touchend 觸發 tap
+    lastPinchDist = pinchDist(e.touches);
+    lastPinchMid  = pinchMid(e.touches);
+  } else if (e.touches.length === 1) {
+    pinching = false;
+    touchMoved = false;
+    panStart = { x: e.touches[0].clientX - tx, y: e.touches[0].clientY - ty };
+  }
+}, { passive: true });
+
+mw.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    touchMoved = true;
+    const dist = pinchDist(e.touches);
+    const mid  = pinchMid(e.touches);
+    const delta = dist / lastPinchDist;
+    // 以 pinch 中心為縮放基準點
+    const mwR = mw.getBoundingClientRect();
+    const cx = mid.x - mwR.left - mwR.width  / 2;
+    const cy = mid.y - mwR.top  - mwR.height / 2;
+    tx += (cx - tx) * (1 - delta);
+    ty += (cy - ty) * (1 - delta);
+    scale *= delta;
+    lastPinchDist = dist;
+    lastPinchMid  = mid;
+    applyTransform();
+  } else if (e.touches.length === 1 && !pinching && scale > 1) {
+    e.preventDefault();
+    touchMoved = true;
+    tx = e.touches[0].clientX - panStart.x;
+    ty = e.touches[0].clientY - panStart.y;
+    applyTransform();
+  } else {
+    touchMoved = true;
+  }
+}, { passive: false });
+
 mw.addEventListener('touchend', e => {
+  if (e.touches.length < 2) pinching = false;
   if (touchMoved) return;
   e.preventDefault();
   const t = e.changedTouches[0];
   handleMapTap(t.clientX, t.clientY, e.target);
+});
+
+// 雙擊重置縮放
+mw.addEventListener('dblclick', () => {
+  scale = 1; tx = 0; ty = 0;
+  applyTransform();
 });
 
 // ── City markers hover（桌面） ────────────────────────────
