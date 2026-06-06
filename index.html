@@ -34,7 +34,7 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;h
 .coast-line{fill:none;stroke:var(--coast);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 3px rgba(26,82,118,.55))}
 .coast-dots{fill:none;stroke:#3d8fb5;stroke-width:1;stroke-dasharray:2 6;opacity:.7}
 #tip{position:absolute;background:rgba(26,26,46,.92);color:#f0e0c0;padding:5px 11px;border-radius:2px;font-size:.76rem;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;border-left:3px solid var(--gold);z-index:99;backdrop-filter:blur(4px)}
-.legend{background:var(--paper2);border-top:1px solid #c8b898;padding:8px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.legend{background:var(--ink);border-top:1px solid rgba(154,104,32,.3);padding:0 14px;display:flex;gap:8px;align-items:center;flex-shrink:0;height:36px;overflow:hidden;white-space:nowrap}
 .li{display:flex;align-items:center;gap:7px;font-size:.72rem;color:#4a3a20}
 .sw{width:28px;height:10px;border-radius:1px}
 .sw-land{background:var(--land);border:1px solid var(--border)}
@@ -395,16 +395,14 @@ body{background:#1c2030;display:flex;align-items:center;justify-content:center;h
 
     </svg>
   </div>
-  <div class="legend">
-    <div class="li"><div class="sw sw-land"></div><span>陸地</span></div>
-    <div class="li"><div class="sw sw-sea"></div><span>海洋</span></div>
-    <div class="li"><div class="sw sw-grid"></div><span>經緯度網格</span></div>
-    <div style="margin:6px 0 3px;font-weight:700;font-size:10px;color:#5a4a2a;letter-spacing:1px">1643年5月勢力範圍</div>
-    <div class="li"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3a86ff;margin-right:4px"></span>明朝（崇禎帝）</div>
-    <div class="li"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f4a261;margin-right:4px"></span>大順（李自成）</div>
-    <div class="li"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2ec4b6;margin-right:4px"></span>大西（張獻忠）</div>
-    <div class="li"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e63946;margin-right:4px"></span>清朝（皇太極）</div>
-    <div class="coords" id="cd">游標位置：—</div>
+  <div class="legend" id="city-info-bar">
+    <div id="ci-dot" style="width:10px;height:10px;border-radius:50%;background:#aaa;flex-shrink:0"></div>
+    <div id="ci-name" style="font-family:'Noto Serif SC',serif;font-size:.85rem;color:#f0d898;font-weight:700;letter-spacing:.06em">—</div>
+    <div id="ci-sep" style="color:rgba(154,104,32,.4);font-size:.8rem">｜</div>
+    <div id="ci-province" style="font-size:.72rem;color:#9ab8d8">點選城市查看資訊</div>
+    <div style="flex:1"></div>
+    <div id="ci-faction" style="font-size:.68rem;letter-spacing:.08em;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.07);color:#c0c8d8"></div>
+    <div class="coords" id="cd" style="font-size:.62rem;color:#5a6a7a;margin-left:8px">—</div>
   </div>
   <div id="official-panel">
     <button id="op-close" title="關閉" style="display:none">✕</button>
@@ -423,6 +421,20 @@ const LON_MIN=73.554302, LON_MAX=134.775703;
 const LAT_MAX=53.561780, LAT_MIN=18.155060;
 const SVG_W=774.04419, SVG_H=447.65989;
 let activeCity = null;
+
+const FACTION_COLORS = {
+  '明朝': '#3a86ff',
+  '清朝': '#e63946',
+  '大順': '#f4a261',
+  '大西': '#2ec4b6',
+};
+function factionColor(label) {
+  const faction = (label || '').split('｜')[2] || '';
+  for (const [key, color] of Object.entries(FACTION_COLORS)) {
+    if (faction.includes(key)) return color;
+  }
+  return '#888';
+}
 
 function toGeo(px,py){
   return {
@@ -495,6 +507,16 @@ function showPanel(el) {
   panel.classList.add('visible');
   document.getElementById('op-close').style.display = 'block';
   opList.scrollLeft = 0;
+
+  // 更新城市資訊條
+  const labelParts2 = (d.label||'').split('｜');
+  const ciName = labelParts2[0] || '';
+  const ciProv = labelParts2[1] || '';
+  const ciFact = labelParts2[2] || '';
+  document.getElementById('ci-name').textContent = ciName;
+  document.getElementById('ci-province').textContent = ciProv;
+  document.getElementById('ci-faction').textContent = ciFact;
+  document.getElementById('ci-dot').style.background = factionColor(d.label);
 }
 
 function closePanel() {
@@ -515,19 +537,6 @@ const cities = Array.from(document.querySelectorAll('.mcity')).map(c => ({
 }));
 
 // ── 動態顏色：依 data-label 第三段勢力決定圓點顏色 ──
-const FACTION_COLORS = {
-  '明朝': '#3a86ff',
-  '清朝': '#e63946',
-  '大順': '#f4a261',
-  '大西': '#2ec4b6',
-};
-function factionColor(label) {
-  const faction = (label || '').split('｜')[2] || '';
-  for (const [key, color] of Object.entries(FACTION_COLORS)) {
-    if (faction.includes(key)) return color;
-  }
-  return '#aaaaaa'; // 未知勢力
-}
 document.querySelectorAll('.mcity').forEach(c => {
   const label = c.dataset.label || '';
   c.setAttribute('fill', factionColor(label));
